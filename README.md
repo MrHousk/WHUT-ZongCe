@@ -1,4 +1,4 @@
-# housikang
+# WHUT评优评先系统
 
 > A Vue.js project
 
