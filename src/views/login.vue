@@ -2,8 +2,13 @@
   <div class="sign-container">
     <div class="sign-content">
       <div class="logo">
-        <div>武汉理工大学</div>
-        <div>综测互评系统</div>
+        <div class="schoolBadge">
+          <img src="static/pic/schoolBadge.png" alt="">
+        </div>
+        <div class="text">
+          <div>武汉理工大学</div>
+          <div>综测互评系统</div>
+        </div>
       </div>
       <div class="sign-innner">
         <el-form class="loginForm" ref="loginForm" :model="loginForm" :rules="loginFormnRule">
@@ -72,7 +77,7 @@
                   name: data
                 });
                 this.$notify.success('登录成功');
-                this.$router.push('/index');
+                this.$router.push('/home');
               } else {
                 this.$notify.closeAll()
                 this.$notify.error('用户名或密码错误');
@@ -102,10 +107,28 @@
       border-radius: 5px;
       width: 450px;
       &>.logo {
-        text-align: center;
-        font-size: 1.5em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin: 30px 0 20px;
         color: var(--color-theme);
+        &>.schoolBadge {
+          width: 6.5em;
+          height: 6.5em;
+          margin-right: 30px;
+          &>img {
+            position: relative;
+            top: 0.3em;
+            max-width: 100%;
+            max-height: 100%;
+          }
+        }
+        &>.text {
+          font-size: 2em;
+          &>.logo-top {
+            font-size: 1.4em;
+          }
+        }
       }
       &>.sign-innner {
         &>.loginForm {
