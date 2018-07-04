@@ -16,7 +16,7 @@ Vue.use(Router)
 const routes = [{
     path: '/',
     redirect: {
-        name: 'login'
+        name: 'home'
     }
 }, {
     path: '/login',
@@ -51,22 +51,20 @@ if (window.localStorage.getItem('account')) {
 }
 
 router.beforeEach((to, from, next) => {
-    if (to.matched.some(r => r.meta.requireAuth)) {
-        if (store.getters.account) {
-            next();
-        } else {
-            MessageBox.confirm('请先登录', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                next({
-                    path: '/login',
-                })
-            })
-        }
-    } else {
+    if (to.path == '/login' && !store.getters.account) {
         next();
+    } else if (store.getters.account) {
+        next();
+    } else {
+        MessageBox.confirm('请先登录', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }).then(() => {
+            next({
+                path: '/login',
+            })
+        })
     }
 })
 
