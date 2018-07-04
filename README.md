@@ -1,4 +1,4 @@
-# WHUT评优评先系统
+# WHUT综测互评系统
 
 > A Vue.js project
 
