@@ -17,7 +17,7 @@ Vue.use(Router)
 const routes = [{
     path: '/',
     redirect: {
-        name: 'home'
+        name: 'login'
     }
 }, {
     path: '/login',
@@ -68,8 +68,7 @@ router.beforeEach((to, from, next) => {
         }
     } else {
         if (to.path == '/login') {
-            Notification.warning('您已登录');
-            return;
+            next('/home');
         } else {
             next();
         }
