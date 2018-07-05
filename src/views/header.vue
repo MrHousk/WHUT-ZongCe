@@ -2,9 +2,6 @@
   <div class="header-container">
     <div class="logo" @click="$router.push('/home')">WHUT综测互评系统</div>
     <div class="header-main">
-      <div class="search">
-        <el-input placeholder="输入关键词进行搜索" suffix-icon="el-icon-search"></el-input>
-      </div>
       <div class="sign">
         <el-popover v-if="$store.getters.account" placement="bottom-end" trigger="hover" width="100">
           <div>
@@ -17,7 +14,7 @@
           </div>
           <div slot="reference" class="logined">
             <div class="welcome">欢迎您：{{$store.getters.name}}</div>
-            <img src="static/pic/avatar.jpg" class="avatar" alt="">
+            <img src="static/pic/avatar.png" class="avatar" alt="">
           </div>
         </el-popover>
         <div v-else class="sign-in" @click="$router.push('/login')">
@@ -99,8 +96,6 @@
               option_type: 'update_password',
               the_password: this.updataPasswordForm.newPassword
             };
-            console.log(param);
-
             api_account.updatePassword(param)
               .then(data => {
                 console.log(data);
@@ -158,10 +153,6 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      &>.search {
-        width: 350px;
-        margin-right: 50px;
-      }
       &>.sign {
         flex-shrink: 0;
         color: var(--color-theme);
