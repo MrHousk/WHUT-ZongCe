@@ -22,17 +22,25 @@
             <el-button class="submit" type="primary" :loading="logining" @click="login">登录</el-button>
           </div>
         </el-form>
-        <!-- <div class="sign-switch">
-          没有账号？
-          <el-button type="text" class="signUp-button">注册</el-button>
-        </div> -->
+        <div class="view-judge">
+          <el-button type="text" class="button" @click="getJudgeList">查看互评小组名单</el-button>
+        </div>
       </div>
     </div>
+
+    <el-dialog title="互评小组名单" :visible.sync="judgeListDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
+      <el-table :data="judgeList" border class="table">
+        <el-table-column prop="studentId" label="学号" width="200px" sortable show-overflow-tooltip></el-table-column>
+        <el-table-column prop="job" label="任职" width="200px" sortable show-overflow-tooltip></el-table-column>
+        <el-table-column prop="name" label="姓名" width="200px" sortable show-overflow-tooltip></el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import api_account from '@/api/account'
+  import api_score from '@/api/score'
   export default {
     data() {
       return {
@@ -52,7 +60,9 @@
             message: '请输入密码',
             trigger: 'blur'
           }]
-        }
+        },
+        judgeListDialogVisible: false,
+        judgeList: []
       }
     },
     mounted() {
@@ -86,6 +96,22 @@
             })
           }
         })
+      },
+      getJudgeList() {
+        api_score.getJudgeList()
+          .then(data => {
+            const judgeList = data;
+            this.judgeList = []
+            for (const judge of judgeList) {
+              let item = {
+                studentId: judge[0],
+                job: judge[1],
+                name: judge[2]
+              }
+              this.judgeList.push(item)
+            }
+            this.judgeListDialogVisible = true;
+          })
       }
     }
   }
@@ -141,14 +167,38 @@
             border-radius: 100px;
           }
         }
-        &>.sign-switch {
+        &>.view-judge {
           text-align: center;
           padding: 12px 0;
           background-color: var(--color-darkWhite);
-          &>.signUp-button {
+          &>.button {
             font-size: 1.1em;
           }
         }
+      }
+    }
+    &>>>.el-dialog {
+      margin-top: 8vh !important;
+      margin-bottom: 0;
+      width: 650px;
+      & .table {
+        width: 602px;
+      }
+      & :matches(.el-dialog__header, .el-dialog__footer) {
+        text-align: center;
+      }
+      & .el-dialog__header {
+        & .el-dialog__headerbtn {
+          right: -40px;
+          top: 10px;
+          font-size: 2em;
+          & .el-dialog__close {
+            color: #fff;
+          }
+        }
+      }
+      & .tips {
+        padding: 25px 0 0 25px;
       }
     }
   }

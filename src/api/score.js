@@ -7,6 +7,9 @@ const serverRequest = axios.create({
 })
 
 export default {
+    getJudgeList() {
+        return serverRequest.get('/ajax_show_account').then(({ data }) => data)
+    },
     getStudentList(params) {
         return serverRequest.post('/ajax_judge', params).then(({ data }) => data)
     },
