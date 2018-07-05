@@ -200,10 +200,6 @@
       margin-top: 8vh !important;
       margin-bottom: 0;
       width: 500px;
-      & .instruction-item {
-        font-size: 1em;
-        margin: 10px;
-      }
       & .el-dialog__header {
         & .el-dialog__headerbtn {
           right: -40px;

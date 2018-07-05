@@ -32,8 +32,8 @@
 
     <el-dialog title="互评小组名单" :visible.sync="judgeListDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-table :data="judgeList" border class="table">
-        <el-table-column prop="job" label="任职" width="250px" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="name" label="姓名" width="248px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="job" label="任职" width="280px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="name" label="姓名" width="220px" show-overflow-tooltip></el-table-column>
       </el-table>
     </el-dialog>
 
@@ -189,13 +189,9 @@
     &>>>.el-dialog {
       margin-top: 8vh !important;
       margin-bottom: 0;
-      width: 540px;
+      width: 550px;
       & .table {
-        width: 540px;
-      }
-      & .instruction-item {
-        font-size: 1em;
-        margin: 10px;
+        width: 502px;
       }
       & :matches(.el-dialog__header, .el-dialog__footer) {
         text-align: center;
