@@ -21,7 +21,7 @@
           登录
         </div>
       </div>
-      <div class="instruction">
+      <div class="instruction" @click="instructionDialogVisible = true">
         使用帮助
         <z-icon name="wenhao1"></z-icon>
       </div>
@@ -44,11 +44,16 @@
         <el-button type="primary" @click="updatePassword">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="使用帮助" :visible.sync="instructionDialogVisible">
+      <instruction></instruction>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import api_account from '@/api/account'
+  import instruction from '@/views/instruction'
   export default {
     data() {
       const checkPassword = (rule, value, callback) => {
@@ -83,7 +88,8 @@
             validator: checkPassword,
             trigger: 'blur'
           }]
-        }
+        },
+        instructionDialogVisible: false
       }
     },
     methods: {
@@ -98,7 +104,6 @@
             };
             api_account.updatePassword(param)
               .then(data => {
-                console.log(data);
                 if (data == 'True') {
                   this.$notify.success('修改成功，请重新登录');
                   this.$store.commit('loginOut');
@@ -129,6 +134,9 @@
           return;
         }
       }
+    },
+    components: {
+      instruction
     }
   }
 </script>
@@ -192,6 +200,10 @@
       margin-top: 8vh !important;
       margin-bottom: 0;
       width: 500px;
+      & .instruction-item {
+        font-size: 1em;
+        margin: 10px;
+      }
       & .el-dialog__header {
         & .el-dialog__headerbtn {
           right: -40px;

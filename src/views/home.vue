@@ -11,7 +11,7 @@
       </el-table-column>
     </el-table>
     <div class="view-score">
-      <el-button class="button" type="text" @click="getScoredList">查看当前评分情况</el-button>
+      <el-button class="button" type="text" @click="getScoredList">查看班级分数统计</el-button>
     </div>
 
     <el-dialog :title="`请对${currentStudent.name}评分`" :visible.sync="scoreDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
@@ -151,8 +151,6 @@
         }
         api_score.getScoredList(param)
           .then(data => {
-            console.log(data);
-
             const students = data;
             if (data !== 'disallow') {
               this.scoredStudentList = []
