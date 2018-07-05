@@ -154,7 +154,7 @@
                 let item = {
                   studentId: student[0],
                   name: student[1],
-                  score: isNaN(student[2]) ? '---' : student[2]
+                  score: Number(student[2]) < 0 ? '---' : student[2]
                 }
                 this.scoredStudentList.push(item)
               }
@@ -166,12 +166,12 @@
   }
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
   @import '../styles/vars.css';
   .home-container {
     height: calc(100vh - 60px);
     overflow: auto;
-    & .table {
+    &>.table {
       width: 602px;
       margin: 50px auto 0;
     }
@@ -185,12 +185,13 @@
         font-size: 1.2em;
       }
     }
-    & .el-dialog {
+    &>>>.el-dialog {
       margin-top: 8vh !important;
       margin-bottom: 0;
-      width: 50%;
-      max-width: 700px;
-      min-width: 500px;
+      width: 650px;
+      & .table {
+        width: 602px;
+      }
       & :matches(.el-dialog__header, .el-dialog__footer) {
         text-align: center;
       }
@@ -205,7 +206,7 @@
         }
       }
       & .tips {
-        padding: 25px 0 0 25px;
+        padding: 25px 0 0 0;
       }
     }
   }
