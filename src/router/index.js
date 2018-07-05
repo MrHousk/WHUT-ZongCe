@@ -7,7 +7,8 @@ import home from '@/views/home'
 import login from '@/views/login'
 
 import {
-    MessageBox
+    MessageBox,
+    Notification
 } from 'element-ui'
 
 
@@ -51,20 +52,27 @@ if (window.localStorage.getItem('account')) {
 }
 
 router.beforeEach((to, from, next) => {
-    if (to.path == '/login' && !store.getters.account) {
-        next();
-    } else if (store.getters.account) {
-        next();
-    } else {
-        MessageBox.confirm('请先登录', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-        }).then(() => {
-            next({
-                path: '/login',
+    if (!store.getters.account) {
+        if (to.path == '/login') {
+            next();
+        } else {
+            MessageBox.confirm('请先登录', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                next({
+                    path: '/login',
+                });
             })
-        })
+        }
+    } else {
+        if (to.path == '/login') {
+            Notification.warning('您已登录');
+            return;
+        } else {
+            next();
+        }
     }
 })
 

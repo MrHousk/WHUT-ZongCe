@@ -9,7 +9,7 @@
         <el-popover v-if="$store.getters.account" placement="bottom-end" trigger="hover" width="100">
           <div>
             <z-icon name="zhanghu"></z-icon>
-            <el-button type="text" @click="personalCenter">账户管理</el-button>
+            <el-button type="text">账户管理</el-button>
           </div>
           <div>
             <z-icon name="zhuxiao"></z-icon>
@@ -48,7 +48,7 @@
             .then(() => {
               this.$store.commit('loginOut');
               this.$notify.success('登出成功');
-              this.$router.push('/home');
+              this.$router.push('/login');
             })
           return;
         }
