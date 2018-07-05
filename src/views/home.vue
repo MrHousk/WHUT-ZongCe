@@ -1,9 +1,9 @@
 <template>
   <div class="home-container">
     <el-table :data="allStudentList" border v-loading="loading" class="table">
-      <el-table-column prop="studentId" label="学号" width="200px" sortable show-overflow-tooltip></el-table-column>
-      <el-table-column prop="name" label="姓名" width="200px" sortable show-overflow-tooltip></el-table-column>
-      <el-table-column prop="scoreState" label="评分状态" width="200px" sortable show-overflow-tooltip>
+      <el-table-column prop="studentId" label="学号" width="200px" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="name" label="姓名" width="200px" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="scoreState" label="评分状态" width="200px" show-overflow-tooltip>
         <template slot-scope="scope">
           <el-tag v-if="allStudentList[scope.$index].scoreState == 'True'">已评分</el-tag>
           <el-button v-else type="primary" size="small" @click="setScoreDialogVisible(scope.row)">评分</el-button>
@@ -11,7 +11,7 @@
       </el-table-column>
     </el-table>
     <div class="view-score">
-      <el-button  class="button" type="text" @click="getScoredList">查看当前评分情况</el-button>
+      <el-button class="button" type="text" @click="getScoredList">查看当前评分情况</el-button>
     </div>
 
     <el-dialog :title="`请对${currentStudent.name}评分`" :visible.sync="scoreDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
@@ -30,11 +30,12 @@
 
     <el-dialog title="班级当前互评结果" :visible.sync="scoredListDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-table :data="scoredStudentList" border class="table">
-        <el-table-column prop="studentId" label="学号" width="200px" sortable show-overflow-tooltip></el-table-column>
-        <el-table-column prop="name" label="姓名" width="200px" sortable show-overflow-tooltip></el-table-column>
-        <el-table-column prop="score" label="得分" width="200px" sortable show-overflow-tooltip></el-table-column>
+        <el-table-column prop="studentId" label="学号" width="150px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="name" label="姓名" width="150px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="score" label="得分" width="150px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="scoreNum" label="已评次数" width="150px" show-overflow-tooltip></el-table-column>
       </el-table>
-      <div class="tips">注：表中得分如出现---，说明当前学生被评分数不足五次</div>
+      <div class="tips">注：表中如出现---，说明当前学生被评分数不足五次</div>
     </el-dialog>
   </div>
 </template>
@@ -73,8 +74,6 @@
           content: '遵纪守法（3分）',
         }, {
           content: '文明习惯（3分）',
-        }, {
-          content: '健康素质（5分）',
         }]
         for (const [key, elem] of val.entries()) {
           const score = parseInt(elem.content.substr(-3, 1))
@@ -112,6 +111,9 @@
       setScoreDialogVisible(row) {
         this.currentStudent = row;
         this.scoreDialogVisible = true;
+        for (const item of this.scoreList) {
+          item.selectedScore = ''
+        }
       },
       //对某个学生提交打分
       submitScore() {
@@ -135,6 +137,8 @@
           .then(data => {
             if (data == 'True') {
               this.$notify.success('评分成功')
+              this.scoreDialogVisible = false
+              this.currentStudent.scoreState = 'True'
             }
           })
       },
@@ -147,6 +151,8 @@
         }
         api_score.getScoredList(param)
           .then(data => {
+            console.log(data);
+
             const students = data;
             if (data !== 'disallow') {
               this.scoredStudentList = []
@@ -154,7 +160,8 @@
                 let item = {
                   studentId: student[0],
                   name: student[1],
-                  score: Number(student[2]) < 0 ? '---' : student[2]
+                  score: Number(student[2]) < 0 ? '---' : student[2],
+                  scoreNum: student[3]
                 }
                 this.scoredStudentList.push(item)
               }
