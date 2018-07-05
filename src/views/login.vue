@@ -25,17 +25,20 @@
         <div class="sign-bottom">
           <el-button type="text" class="button" @click="getJudgeList">查看互评小组名单</el-button>
           <span>|</span>
-          <el-button type="text" class="button" @click="viewInstruction">使用帮助</el-button>
+          <el-button type="text" class="button" @click="instructionDialogVisible = true">使用帮助</el-button>
         </div>
       </div>
     </div>
 
     <el-dialog title="互评小组名单" :visible.sync="judgeListDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-table :data="judgeList" border class="table">
-        <el-table-column prop="studentId" label="学号" width="200px" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="job" label="任职" width="200px" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="name" label="姓名" width="200px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="job" label="任职" width="250px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="name" label="姓名" width="248px" show-overflow-tooltip></el-table-column>
       </el-table>
+    </el-dialog>
+
+    <el-dialog title="使用帮助" :visible.sync="instructionDialogVisible">
+      <instruction></instruction>
     </el-dialog>
   </div>
 </template>
@@ -43,6 +46,7 @@
 <script>
   import api_account from '@/api/account'
   import api_score from '@/api/score'
+  import instruction from '@/views/instruction'
   export default {
     data() {
       return {
@@ -64,7 +68,8 @@
           }]
         },
         judgeListDialogVisible: false,
-        judgeList: []
+        judgeList: [],
+        instructionDialogVisible: false
       }
     },
     mounted() {
@@ -80,7 +85,6 @@
               password: this.loginForm.password
             };
             api_account.login(loginObj).then(data => {
-              console.log(data);
               if (data !== 'disallow') {
                 this.logining = false
                 this.$store.commit('loginIn', {
@@ -106,18 +110,17 @@
             this.judgeList = []
             for (const judge of judgeList) {
               let item = {
-                studentId: judge[0],
-                job: judge[1],
-                name: judge[2]
+                job: judge[0],
+                name: judge[1]
               }
               this.judgeList.push(item)
             }
             this.judgeListDialogVisible = true;
           })
-      },
-      viewInstruction() {
-
       }
+    },
+    components: {
+      instruction
     }
   }
 </script>
@@ -186,9 +189,13 @@
     &>>>.el-dialog {
       margin-top: 8vh !important;
       margin-bottom: 0;
-      width: 650px;
+      width: 540px;
       & .table {
-        width: 602px;
+        width: 540px;
+      }
+      & .instruction-item {
+        font-size: 1em;
+        margin: 10px;
       }
       & :matches(.el-dialog__header, .el-dialog__footer) {
         text-align: center;
