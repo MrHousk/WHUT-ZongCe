@@ -22,17 +22,19 @@
             <el-button class="submit" type="primary" :loading="logining" @click="login">登录</el-button>
           </div>
         </el-form>
-        <div class="view-judge">
+        <div class="sign-bottom">
           <el-button type="text" class="button" @click="getJudgeList">查看互评小组名单</el-button>
+          <span>|</span>
+          <el-button type="text" class="button" @click="viewInstruction">使用帮助</el-button>
         </div>
       </div>
     </div>
 
     <el-dialog title="互评小组名单" :visible.sync="judgeListDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
       <el-table :data="judgeList" border class="table">
-        <el-table-column prop="studentId" label="学号" width="200px" sortable show-overflow-tooltip></el-table-column>
-        <el-table-column prop="job" label="任职" width="200px" sortable show-overflow-tooltip></el-table-column>
-        <el-table-column prop="name" label="姓名" width="200px" sortable show-overflow-tooltip></el-table-column>
+        <el-table-column prop="studentId" label="学号" width="200px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="job" label="任职" width="200px" show-overflow-tooltip></el-table-column>
+        <el-table-column prop="name" label="姓名" width="200px" show-overflow-tooltip></el-table-column>
       </el-table>
     </el-dialog>
   </div>
@@ -112,6 +114,9 @@
             }
             this.judgeListDialogVisible = true;
           })
+      },
+      viewInstruction() {
+
       }
     }
   }
@@ -167,10 +172,11 @@
             border-radius: 100px;
           }
         }
-        &>.view-judge {
+        &>.sign-bottom {
           text-align: center;
           padding: 12px 0;
           background-color: var(--color-darkWhite);
+          color: var(--color-theme);
           &>.button {
             font-size: 1.1em;
           }
@@ -196,9 +202,6 @@
             color: #fff;
           }
         }
-      }
-      & .tips {
-        padding: 25px 0 0 25px;
       }
     }
   }
