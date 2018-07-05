@@ -92,7 +92,7 @@
           if (valid) {
             let param = {
               user_name: this.$store.getters.account,
-              password: this.$store.getters.password,
+              password: this.updataPasswordForm.oldPassword,
               option_type: 'update_password',
               the_password: this.updataPasswordForm.newPassword
             };
@@ -101,8 +101,8 @@
                 console.log(data);
                 if (data == 'True') {
                   this.$notify.success('修改成功，请重新登录');
-                  this.$router.push('/login');
                   this.$store.commit('loginOut');
+                  this.$router.push('/login');
                 } else if (data == 'disallow') {
                   this.$notify.closeAll()
                   this.$notify.error('旧密码错误');
