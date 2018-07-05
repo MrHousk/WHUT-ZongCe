@@ -9,7 +9,7 @@
         <el-popover v-if="$store.getters.account" placement="bottom-end" trigger="hover" width="100">
           <div>
             <z-icon name="zhanghu"></z-icon>
-            <el-button type="text">账户管理</el-button>
+            <el-button type="text" @click="updataPasswordDialogVisible = true">修改密码</el-button>
           </div>
           <div>
             <z-icon name="zhuxiao"></z-icon>
@@ -25,18 +25,99 @@
         </div>
       </div>
       <div class="instruction">
-        使用帮助<z-icon name="wenhao1"></z-icon>
+        使用帮助
+        <z-icon name="wenhao1"></z-icon>
       </div>
     </div>
+
+    <el-dialog title="修改密码" :visible.sync="updataPasswordDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
+      <el-form :model="updataPasswordForm" ref="updataPasswordForm" class="update-password-form" :rules="updataPasswordFormRules"
+        label-width="120px">
+        <el-form-item prop="oldPassword" label="旧密码">
+          <el-input v-model="updataPasswordForm.oldPassword" type="password" auto-complete="off" placeholder="请输入您的旧密码" autofocus>
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="newPassword" label="新密码">
+          <el-input v-model="updataPasswordForm.newPassword" type="password" auto-complete="off" placeholder="请输入您的新密码" autofocus>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="updataPasswordDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updatePassword">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+  import api_account from '@/api/account'
   export default {
     data() {
-      return {}
+      const checkPassword = (rule, value, callback) => {
+        if (/^(?![\d]+$)(?![a-zA-Z]+$)(?![!#$%^&*]+$)[\da-zA-Z!#$%^&*]{6,20}$/.test(value)) {
+          callback();
+        } else {
+          callback(new Error("密码应至少包含数字、字母、特殊字符中的两种"))
+        }
+      }
+      return {
+        updataPasswordDialogVisible: false,
+        updataPasswordForm: {
+          oldPassword: '',
+          newPassword: ''
+        },
+        updataPasswordFormRules: {
+          oldPassword: [{
+            required: true,
+            message: '旧密码不能为空',
+            trigger: 'blur'
+          }],
+          newPassword: [{
+            required: true,
+            message: '新密码不能为空',
+            trigger: 'blur'
+          }, {
+            min: 6,
+            max: 18,
+            message: '密码长度需要在6-18',
+            trigger: 'blur'
+          }, {
+            validator: checkPassword,
+            trigger: 'blur'
+          }]
+        }
+      }
     },
     methods: {
+      updatePassword() {
+        this.$refs.updataPasswordForm.validate(valid => {
+          if (valid) {
+            let param = {
+              user_name: this.$store.getters.account,
+              password: this.$store.getters.password,
+              option_type: 'update_password',
+              the_password: this.updataPasswordForm.newPassword
+            };
+            console.log(param);
+
+            api_account.updatePassword(param)
+              .then(data => {
+                console.log(data);
+                if (data == 'True') {
+                  this.$notify.success('修改成功，请重新登录');
+                  this.$router.push('/login');
+                  this.$store.commit('loginOut');
+                } else if (data == 'disallow') {
+                  this.$notify.closeAll()
+                  this.$notify.error('旧密码错误');
+                } else {
+                  this.$notify.error('服务器错误');
+                }
+              })
+          }
+        })
+      },
       loginOut() {
         if (window.localStorage.getItem('account')) {
           this.$confirm("您已登录，确定退出吗?", "提示", {
@@ -57,7 +138,7 @@
   }
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
   @import '../styles/vars.css';
   .header-container {
     height: 100%;
@@ -113,6 +194,21 @@
         &>.icon {
           width: 1em;
           height: 1em;
+        }
+      }
+    }
+    &>>>.el-dialog {
+      margin-top: 8vh !important;
+      margin-bottom: 0;
+      width: 500px;
+      & .el-dialog__header {
+        & .el-dialog__headerbtn {
+          right: -40px;
+          top: 10px;
+          font-size: 2em;
+          & .el-dialog__close {
+            color: #fff;
+          }
         }
       }
     }

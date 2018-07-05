@@ -9,5 +9,8 @@ const serverRequest = axios.create({
 export default {
     login(params) {
         return serverRequest.get('/ajax_account', { params }).then(({ data }) => data)
+    },
+    updatePassword(params) {
+        return serverRequest.post('/ajax_account', params).then(({ data }) => data)
     }
 }
