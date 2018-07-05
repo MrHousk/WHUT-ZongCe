@@ -13,7 +13,7 @@ export default {
     setScore(params) {
         return serverRequest.post('/ajax_judge', params).then(({ data }) => data)
     },
-    getScore(params) {
+    getScoredList(params) {
         return serverRequest.post('/ajax_judge', params).then(({ data }) => data)
     },
 }

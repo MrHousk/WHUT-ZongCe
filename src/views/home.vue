@@ -1,15 +1,18 @@
 <template>
   <div class="home-container">
-    <el-table :data="tableData" border v-loading="loading" class="table">
+    <el-table :data="allStudentList" border v-loading="loading" class="table">
       <el-table-column prop="studentId" label="学号" width="200px" sortable show-overflow-tooltip></el-table-column>
       <el-table-column prop="name" label="姓名" width="200px" sortable show-overflow-tooltip></el-table-column>
       <el-table-column prop="scoreState" label="评分状态" width="200px" sortable show-overflow-tooltip>
         <template slot-scope="scope">
-          <el-tag v-if="tableData[scope.$index].scoreState == 'True'">已评分</el-tag>
-          <el-button v-else type="primary" size="small" @click="score(scope.row)">评分</el-button>
+          <el-tag v-if="allStudentList[scope.$index].scoreState == 'True'">已评分</el-tag>
+          <el-button v-else type="primary" size="small" @click="setScoreDialogVisible(scope.row)">评分</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <div class="view-score">
+      <el-button  class="button" type="text" @click="getScoredList">查看当前评分情况</el-button>
+    </div>
 
     <el-dialog :title="`请对${currentStudent.name}评分`" :visible.sync="scoreDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
       <div v-for="(scoreItem, scoreIndex) in scoreList" :key="scoreIndex">
@@ -24,6 +27,15 @@
         <el-button type="primary" @click="submitScore">提交</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="班级当前互评结果" :visible.sync="scoredListDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
+      <el-table :data="scoredStudentList" border class="table">
+        <el-table-column prop="studentId" label="学号" width="200px" sortable show-overflow-tooltip></el-table-column>
+        <el-table-column prop="name" label="姓名" width="200px" sortable show-overflow-tooltip></el-table-column>
+        <el-table-column prop="score" label="得分" width="200px" sortable show-overflow-tooltip></el-table-column>
+      </el-table>
+      <div class="tips">注：表中得分如出现---，说明当前学生被评分数不足五次</div>
+    </el-dialog>
   </div>
 </template>
 
@@ -32,36 +44,22 @@
   export default {
     data() {
       return {
-        tableData: [],
+        allStudentList: [],
         loading: false,
         scoreDialogVisible: false,
         scoreList: [],
-        currentStudent: {}
+        currentStudent: {},
+        scoredListDialogVisible: false,
+        scoredStudentList: []
       }
     },
     mounted() {
       this.$notify.closeAll();
       this.generateScoreList();
-      let param = {
-        user_name: this.$store.getters.account,
-        password: this.$store.getters.password,
-        option_type: 'get_student_list'
-      }
-      api_score.getStudentList(param)
-        .then(data => {
-          console.log(data);
-          const students = data;
-          for (const student of students) {
-            let item = {
-              studentId: student[0],
-              name: student[1],
-              scoreState: student[2]
-            }
-            this.tableData.push(item)
-          }
-        })
+      this.getStudentList();
     },
     methods: {
+      //生成打分表
       generateScoreList() {
         let val = [{
           content: '政治思想表现（6分）',
@@ -91,10 +89,31 @@
           }, elem))
         }
       },
-      score(row) {
+      //获取该班所有学生列表
+      getStudentList() {
+        let param = {
+          user_name: this.$store.getters.account,
+          password: this.$store.getters.password,
+          option_type: 'get_student_list'
+        }
+        api_score.getStudentList(param)
+          .then(data => {
+            const students = data;
+            for (const student of students) {
+              let item = {
+                studentId: student[0],
+                name: student[1],
+                scoreState: student[2]
+              }
+              this.allStudentList.push(item)
+            }
+          })
+      },
+      setScoreDialogVisible(row) {
         this.currentStudent = row;
         this.scoreDialogVisible = true;
       },
+      //对某个学生提交打分
       submitScore() {
         let score_list = []
         for (const item of this.scoreList) {
@@ -114,8 +133,33 @@
         }
         api_score.setScore(param)
           .then(data => {
-            console.log(data);
-
+            if (data == 'True') {
+              this.$notify.success('评分成功')
+            }
+          })
+      },
+      //获取已评分学生列表
+      getScoredList() {
+        let param = {
+          user_name: this.$store.getters.account,
+          password: this.$store.getters.password,
+          option_type: 'get_score'
+        }
+        api_score.getScoredList(param)
+          .then(data => {
+            const students = data;
+            if (data !== 'disallow') {
+              this.scoredStudentList = []
+              for (const student of students) {
+                let item = {
+                  studentId: student[0],
+                  name: student[1],
+                  score: isNaN(student[2]) ? '---' : student[2]
+                }
+                this.scoredStudentList.push(item)
+              }
+              this.scoredListDialogVisible = true;
+            }
           })
       }
     }
@@ -123,10 +167,23 @@
 </script>
 
 <style lang="postcss">
+  @import '../styles/vars.css';
   .home-container {
+    height: calc(100vh - 60px);
+    overflow: auto;
     & .table {
       width: 602px;
-      margin: 50px auto;
+      margin: 50px auto 0;
+    }
+    &>.view-score {
+      width: 602px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 12px 0;
+      background-color: var(--color-darkWhite);
+      &>.button {
+        font-size: 1.2em;
+      }
     }
     & .el-dialog {
       margin-top: 8vh !important;
@@ -146,6 +203,9 @@
             color: #fff;
           }
         }
+      }
+      & .tips {
+        padding: 25px 0 0 25px;
       }
     }
   }
