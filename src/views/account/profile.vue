@@ -37,6 +37,10 @@
           <el-input v-model="updataPasswordForm.newPassword" type="password" auto-complete="off" placeholder="请输入您的新密码" autofocus>
           </el-input>
         </el-form-item>
+        <el-form-item prop="reNewPassword" label="重复新密码">
+          <el-input v-model="updataPasswordForm.reNewPassword" type="password" auto-complete="off" placeholder="再次输入您的新密码" autofocus>
+          </el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="updataPasswordDialogVisible = false">取 消</el-button>
@@ -83,7 +87,8 @@
         updataPasswordDialogVisible: false,
         updataPasswordForm: {
           oldPassword: '',
-          newPassword: ''
+          newPassword: '',
+          reNewPassword: ''
         },
         updataPasswordFormRules: {
           oldPassword: [{
@@ -102,6 +107,20 @@
             trigger: 'blur'
           }, {
             validator: checkPassword,
+            trigger: 'blur'
+          }],
+          reNewPassword: [{
+            required: true,
+            message: '请再次输入新密码',
+            trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              if (value == this.updataPasswordForm.newPassword) {
+                callback();
+              } else {
+                callback(new Error("两次输入不一致"))
+              }
+            },
             trigger: 'blur'
           }]
         },
