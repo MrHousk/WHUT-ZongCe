@@ -12,5 +12,14 @@ export default {
     },
     updatePassword(params) {
         return serverRequest.post('/ajax_account', params).then(({ data }) => data)
+    },
+    getAvatar(params) {
+        return serverRequest.get('/ajax_picture', { params }).then(({ data }) => data)
+    },
+    changeAvatar(params) {
+        return serverRequest.post('/ajax_upload', params).then(({ data }) => data)
+    },
+    batchImport(params) {
+        return serverRequest.post('/ajax_upload', params).then(({ data }) => data)
     }
 }

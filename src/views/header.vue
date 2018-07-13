@@ -6,7 +6,7 @@
         <el-popover v-if="$store.getters.account" placement="bottom-end" trigger="hover" width="100">
           <div>
             <z-icon name="zhanghu"></z-icon>
-            <el-button type="text" @click="updataPasswordDialogVisible = true">修改密码</el-button>
+            <el-button type="text" @click="manageAccount">账户管理</el-button>
           </div>
           <div>
             <z-icon name="zhuxiao"></z-icon>
@@ -14,7 +14,7 @@
           </div>
           <div slot="reference" class="logined">
             <div class="welcome">欢迎您：{{$store.getters.name}}</div>
-            <img src="static/pic/avatar.png" class="avatar" alt="">
+            <img :src="$store.getters.avatar||'static/pic/avatar.png'" class="avatar" alt="">
           </div>
         </el-popover>
         <div v-else class="sign-in" @click="$router.push('/login')">
@@ -27,24 +27,6 @@
       </div>
     </div>
 
-    <el-dialog title="修改密码" :visible.sync="updataPasswordDialogVisible" :close-on-click-modal="false" :close-on-press-escape="false">
-      <el-form :model="updataPasswordForm" ref="updataPasswordForm" class="update-password-form" :rules="updataPasswordFormRules"
-        label-width="120px">
-        <el-form-item prop="oldPassword" label="旧密码">
-          <el-input v-model="updataPasswordForm.oldPassword" type="password" auto-complete="off" placeholder="请输入您的旧密码" autofocus>
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="newPassword" label="新密码">
-          <el-input v-model="updataPasswordForm.newPassword" type="password" auto-complete="off" placeholder="请输入您的新密码" autofocus>
-          </el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="updataPasswordDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="updatePassword">确 定</el-button>
-      </div>
-    </el-dialog>
-
     <el-dialog title="使用帮助" :visible.sync="instructionDialogVisible">
       <instruction></instruction>
     </el-dialog>
@@ -56,67 +38,18 @@
   import instruction from '@/views/instruction'
   export default {
     data() {
-      const checkPassword = (rule, value, callback) => {
-        if (/^(?![\d]+$)(?![a-zA-Z]+$)(?![!#$%^&*]+$)[\da-zA-Z!#$%^&*]{6,20}$/.test(value)) {
-          callback();
-        } else {
-          callback(new Error("密码应至少包含数字、字母、特殊字符中的两种"))
-        }
-      }
       return {
-        updataPasswordDialogVisible: false,
-        updataPasswordForm: {
-          oldPassword: '',
-          newPassword: ''
-        },
-        updataPasswordFormRules: {
-          oldPassword: [{
-            required: true,
-            message: '旧密码不能为空',
-            trigger: 'blur'
-          }],
-          newPassword: [{
-            required: true,
-            message: '新密码不能为空',
-            trigger: 'blur'
-          }, {
-            min: 6,
-            max: 18,
-            message: '密码长度需要在6-18',
-            trigger: 'blur'
-          }, {
-            validator: checkPassword,
-            trigger: 'blur'
-          }]
-        },
         instructionDialogVisible: false
       }
     },
     methods: {
-      updatePassword() {
-        this.$refs.updataPasswordForm.validate(valid => {
-          if (valid) {
-            let param = {
-              user_name: this.$store.getters.account,
-              password: this.updataPasswordForm.oldPassword,
-              option_type: 'update_password',
-              the_password: this.updataPasswordForm.newPassword
-            };
-            api_account.updatePassword(param)
-              .then(data => {
-                if (data == 'True') {
-                  this.$notify.success('修改成功，请重新登录');
-                  this.$store.commit('loginOut');
-                  this.$router.push('/login');
-                } else if (data == 'disallow') {
-                  this.$notify.closeAll()
-                  this.$notify.error('旧密码错误');
-                } else {
-                  this.$notify.error('服务器错误');
-                }
-              })
+      manageAccount() {
+        this.$router.push({
+          name: 'profile',
+          params: {
+            id: this.$store.getters.account
           }
-        })
+        });
       },
       loginOut() {
         if (window.localStorage.getItem('account')) {
